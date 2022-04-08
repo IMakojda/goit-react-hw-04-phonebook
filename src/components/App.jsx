@@ -1,4 +1,5 @@
-import React, { Component } from "react";
+import { useState} from "react";
+import useLocalStorage from "./hooks/localStorageHooks";
 import Form from "./form/form";
 import { nanoid } from 'nanoid'
 import Section from "./section/section";
@@ -6,78 +7,62 @@ import ContactList from "./contacts/contactsList";
 import FilterContacts from "./filter/filterInput";
 import Notiflix from 'notiflix';
 
+export default function App() {
 
-class App extends Component {
-  state = {
-    contacts: [],
-    filter: '',
-  }
+  const [contacts, setContacts] = useLocalStorage('contacts');
+  const [filter, setFilter] = useState('');
 
-  formSubmitContactAdd = ({name,number}) => {
-    const { contacts } = this.state;
+  const formSubmitContactAdd = ({name,number}) => {
     const contact = {
-      id:nanoid(),
       name,
       number,
-    }
+      id:nanoid(),
+    };
 
     if (
         contacts.find(contact => contact.name.toLowerCase() === name.toLowerCase()) ||
         contacts.find(contact => contact.number === number)
         )
     {
-      return Notiflix.Notify.failure(`${contact.name} is already in contacts`);
+      return Notiflix.Notify.failure(`${name} is already in contacts`);
     }
 
-    this.setState(({ contacts }) => ({
-      contacts: [contact, ...contacts],
-    }));
-    
+    setContacts([contact, ...contacts]);
+
   }
 
-  deleteContact = contactId => {
-    this.setState(prevState => ({
-      contacts:prevState.contacts.filter(contact=> contact.id !==contactId),
-    }))
+  const deleteContact = contactId => {
+    setContacts(contacts.filter(contact => contact.id !== contactId));
   }
 
-  onHandleFilter = e => {
-    this.setState({filter:e.currentTarget.value})
+  const  onHandleFilter = e => {
+    setFilter(e.currentTarget.value);
   }
-  componentDidMount() { 
-    const contactsLocalStorage = localStorage.getItem('contacts')
-    const parsedContacts = JSON.parse(contactsLocalStorage)
-    if(parsedContacts){this.setState({ contacts: parsedContacts })}
+
+  const filteredContacts = () => {
+    const normalizeContacts = filter.toLowerCase();
+    return contacts.filter(contact =>
+      contact.name.toLowerCase().includes(normalizeContacts),
+    );   
   }
-  componentDidUpdate(prevProps, prevState) {
-    const { contacts } = this.state;
-      if (contacts !== prevState.contacts) {
-      localStorage.setItem("contacts",JSON.stringify(contacts))
-    }
-  }
-  render() {
-    const { filter } = this.state;
-    const normalizeContacts=filter.toLocaleLowerCase()
-    const visibleContacts = this.state.contacts.filter(contact => contact.name.toLocaleLowerCase().includes(normalizeContacts));
-    return (
+
+     return (
       <>
         <Section title="PhoneBook">
-          <Form onSubmit={this.formSubmitContactAdd} />
+          <Form onSubmit={formSubmitContactAdd} />
         </Section>
 
         <Section title="Contacts">
           <FilterContacts
             value={filter}
-            onChange={this.onHandleFilter}
+            onChange={onHandleFilter}
           />
           <ContactList
-            contactList={visibleContacts}
-            onDelete={this.deleteContact}
+            contactList={filteredContacts()}
+            onDelete={deleteContact}
           /> 
         </Section>
       </>
     )
-  }
-}
-
-export default App;
+ 
+};
