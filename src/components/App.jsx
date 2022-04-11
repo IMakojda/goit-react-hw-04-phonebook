@@ -1,5 +1,5 @@
 import { useState} from "react";
-import useLocalStorage from "./hooks/localStorageHooks";
+import useLocalStorage from "../hooks/localStorageHooks";
 import Form from "./form/form";
 import { nanoid } from 'nanoid'
 import Section from "./section/section";
@@ -41,11 +41,13 @@ export default function App() {
 
   const filteredContacts = () => {
     const normalizeContacts = filter.toLowerCase();
+      
     return contacts.filter(contact =>
       contact.name.toLowerCase().includes(normalizeContacts),
-    );   
+    );
   }
-
+  const arryContacts = filteredContacts();
+  
      return (
       <>
         <Section title="PhoneBook">
@@ -58,7 +60,7 @@ export default function App() {
             onChange={onHandleFilter}
           />
           <ContactList
-            contactList={filteredContacts()}
+            contactList={arryContacts}
             onDelete={deleteContact}
           /> 
         </Section>
