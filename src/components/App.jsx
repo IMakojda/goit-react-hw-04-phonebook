@@ -39,14 +39,9 @@ export default function App() {
     setFilter(e.currentTarget.value);
   }
 
-  const filteredContacts = () => {
-    const normalizeContacts = filter.toLowerCase();
-      
-    return contacts.filter(contact =>
-      contact.name.toLowerCase().includes(normalizeContacts),
-    );
-  }
-  const arryContacts = filteredContacts();
+  const filteredContacts = contacts.filter(contact =>contact.name.toLowerCase().includes(filter.toLowerCase()));
+  
+  
   
      return (
       <>
@@ -60,7 +55,7 @@ export default function App() {
             onChange={onHandleFilter}
           />
           <ContactList
-            contactList={arryContacts}
+            contactList={filteredContacts}
             onDelete={deleteContact}
           /> 
         </Section>
