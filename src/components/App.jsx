@@ -41,8 +41,6 @@ export default function App() {
 
   const filteredContacts = contacts.filter(contact =>contact.name.toLowerCase().includes(filter.toLowerCase()));
   
-  
-  
      return (
       <>
         <Section title="PhoneBook">
